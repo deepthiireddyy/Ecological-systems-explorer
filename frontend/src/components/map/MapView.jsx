@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  MapContainer as LeafletMap,
+  MapContainer,
   FeatureGroup,
   GeoJSON,
-  useMap
+  useMap,
+  LayersControl,
+  TileLayer
 } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
@@ -17,45 +19,6 @@ import BasemapToggle from './BasemapToggle';
 import MapTitle from './MapTitle';
 import MapLoadingOverlay from './MapLoadingOverlay';
 
-// ── GEE tile layer ─────────────────────────────────────────────
-function GEETileLayer({ url }) {
-  const map = useMap();
-  const tileRef = useRef(null);
-
-  useEffect(() => {
-    if (!url) return;
-
-    if (tileRef.current) {
-      map.removeLayer(tileRef.current);
-      tileRef.current = null;
-    }
-
-    const layer = L.tileLayer(url, {
-      opacity: 1,
-      maxZoom: 22,
-      tileSize: 256,
-      attribution: 'Google Earth Engine'
-    });
-
-    layer.addTo(map);
-
-    // 🔥 important fixes
-    layer.bringToFront();
-    map.invalidateSize();
-
-    tileRef.current = layer;
-
-    return () => {
-      if (tileRef.current) {
-        map.removeLayer(tileRef.current);
-        tileRef.current = null;
-      }
-    };
-  }, [url, map]);
-
-  return null;
-}
-
 // ── Fit bounds ─────────────────────────────────────────────
 function FitBoundsController({ geojson }) {
   const map = useMap();
@@ -66,31 +29,12 @@ function FitBoundsController({ geojson }) {
     try {
       const bounds = L.geoJSON(geojson).getBounds();
       if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
       }
     } catch (_) {}
   }, [geojson, map]);
 
   return null;
-}
-
-// ── AOI Layer ─────────────────────────────────────────────
-function AOILayer({ aoi }) {
-  if (!aoi) return null;
-
-  return (
-    <GeoJSON
-      key={JSON.stringify(aoi)}
-      data={aoi}
-      style={{
-        color: '#e53935',
-        weight: 2.5,
-        opacity: 1,
-        fillColor: '#000',
-        fillOpacity: 0.04
-      }}
-    />
-  );
 }
 
 // ── Legend ─────────────────────────────────────────────
@@ -154,8 +98,7 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
     setAOI,
     imageryTileUrl,
     indexTileUrl,
-    bgTileUrl,
-    activeLayer
+    bgTileUrl
   } = useAppStore();
 
   const featureGroupRef = useRef(null);
@@ -181,17 +124,6 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
       ? 'Computing spectral index…'
       : 'Generating Blue–Green system…';
 
-  // ✅ Decide which layer to show
-  let activeTileUrl = null;
-
-  if (activeLayer === 'imagery') {
-    activeTileUrl = geeLayerUrl || imageryTileUrl;
-  } else if (activeLayer === 'index') {
-    activeTileUrl = indexTileUrl;
-  } else if (activeLayer === 'bg') {
-    activeTileUrl = bgTileUrl;
-  }
-
   // ✅ Handle drawing
   const handleCreated = (e) => {
     const layer = e.layer;
@@ -204,7 +136,6 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
     onAOIDrawn(geojson);
   };
 
-  // ✅ Handle delete
   const handleDeleted = () => {
     if (defaultAOI) {
       setAOI(defaultAOI);
@@ -215,19 +146,56 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
 
   return (
     <div className="map-container">
-      <LeafletMap
+      <MapContainer
         center={[20.5937, 78.9629]}
         zoom={5}
         style={{ width: '100%', height: '100%' }}
-        zoomControl={true}
       >
         <BasemapToggle />
 
-        <AOILayer aoi={aoi} />
-        <FitBoundsController geojson={aoi} />
+        {/* 🔥 LAYERS CONTROL */}
+        <LayersControl position="topright">
 
-        {/* 🔥 FIXED: dynamic layer rendering */}
-        {activeTileUrl && <GEETileLayer url={activeTileUrl} />}
+          {/* AOI */}
+          {aoi && (
+            <LayersControl.Overlay checked name="AOI Boundary">
+              <GeoJSON
+                data={aoi}
+                style={{
+                  color: '#e53935',
+                  weight: 2.5,
+                  opacity: 1,
+                  fillColor: '#000',
+                  fillOpacity: 0.04
+                }}
+              />
+            </LayersControl.Overlay>
+          )}
+
+          {/* Imagery */}
+          {(geeLayerUrl || imageryTileUrl) && (
+            <LayersControl.Overlay checked name="Imagery">
+              <TileLayer url={geeLayerUrl || imageryTileUrl} />
+            </LayersControl.Overlay>
+          )}
+
+          {/* NDVI / Index */}
+          {indexTileUrl && (
+            <LayersControl.Overlay name="Index (NDVI)">
+              <TileLayer url={indexTileUrl} />
+            </LayersControl.Overlay>
+          )}
+
+          {/* Blue-Green */}
+          {bgTileUrl && (
+            <LayersControl.Overlay name="Blue-Green">
+              <TileLayer url={bgTileUrl} />
+            </LayersControl.Overlay>
+          )}
+
+        </LayersControl>
+
+        <FitBoundsController geojson={aoi} />
 
         <FeatureGroup ref={featureGroupRef}>
           <EditControl
@@ -248,7 +216,7 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
 
         <ActiveLegend />
         <ConditionalMapTitle />
-      </LeafletMap>
+      </MapContainer>
 
       <MapLoadingOverlay loading={isLoading} message={loadingMessage} />
       <Notification />
