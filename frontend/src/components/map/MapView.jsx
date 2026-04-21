@@ -15,7 +15,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import useAppStore from '../../store/appStore';
 import Notification from '../ui/Notification';
 import { GradientLegend, BlueGreenLegend } from './Legend';
-import BasemapToggle from './BasemapToggle';
+// import BasemapToggle from './BasemapToggle';
 import MapTitle from './MapTitle';
 import MapLoadingOverlay from './MapLoadingOverlay';
 
@@ -88,6 +88,26 @@ function ConditionalMapTitle() {
   return null;
 }
 
+// ── Click handler ─────────────────────────────────────────────
+function ClickInfoHandler({ onClick }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      const { lat, lng } = e.latlng;
+      onClick({ lat, lng });
+    };
+
+    map.on('click', handleClick);
+
+    return () => {
+      map.off('click', handleClick);
+    };
+  }, [map, onClick]);
+
+  return null;
+}
+
 // ── MAIN COMPONENT ─────────────────────────────────────────────
 export default function MapView({ geeLayerUrl, onAOIDrawn }) {
   const {
@@ -102,9 +122,12 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
   } = useAppStore();
 
   const featureGroupRef = useRef(null);
-  const [defaultAOI, setDefaultAOI] = useState(null);
 
-  // ✅ Load default AOI
+  // FIXED STATE
+  const [defaultAOI, setDefaultAOI] = useState(null);
+  const [clickInfo, setClickInfo] = useState(null);
+
+  // Load default AOI
   useEffect(() => {
     fetch('/aoi.geojson')
       .then(res => res.json())
@@ -124,7 +147,15 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
       ? 'Computing spectral index…'
       : 'Generating Blue–Green system…';
 
-  // ✅ Handle drawing
+  // Click handler
+  const handleMapClick = ({ lat, lng }) => {
+    setClickInfo({
+      lat: lat.toFixed(5),
+      lng: lng.toFixed(5)
+    });
+  };
+
+  // Handle drawing
   const handleCreated = (e) => {
     const layer = e.layer;
 
@@ -151,10 +182,28 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
         zoom={5}
         style={{ width: '100%', height: '100%' }}
       >
-        <BasemapToggle />
+        {/* <BasemapToggle /> */}
 
-        {/* 🔥 LAYERS CONTROL */}
+        {/* CLICK HANDLER */}
+        <ClickInfoHandler onClick={handleMapClick} />
+
+        {/* LAYERS CONTROL */}
         <LayersControl position="topright">
+
+          {/* 🔥 BASEMAPS */}
+          <LayersControl.BaseLayer checked name="Streets">
+            <TileLayer
+              url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+              attribution="&copy; OpenStreetMap"
+            />
+          </LayersControl.BaseLayer>
+
+          <LayersControl.BaseLayer name="Satellite">
+            <TileLayer
+              url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+              attribution='Esri World Imagery'
+            />
+          </LayersControl.BaseLayer>
 
           {/* AOI */}
           {aoi && (
@@ -179,7 +228,7 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
             </LayersControl.Overlay>
           )}
 
-          {/* NDVI / Index */}
+          {/* NDVI */}
           {indexTileUrl && (
             <LayersControl.Overlay name="Index (NDVI)">
               <TileLayer url={indexTileUrl} />
@@ -217,6 +266,24 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
         <ActiveLegend />
         <ConditionalMapTitle />
       </MapContainer>
+
+      {/* CLICK INFO BOX */}
+      {clickInfo && (
+        <div style={{
+          position: 'absolute',
+          bottom: '20px',
+          right: '20px',
+          zIndex: 1000,
+          background: 'white',
+          padding: '8px 12px',
+          borderRadius: '6px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+          fontSize: '12px'
+        }}>
+          <div><b>Lat:</b> {clickInfo.lat}</div>
+          <div><b>Lon:</b> {clickInfo.lng}</div>
+        </div>
+      )}
 
       <MapLoadingOverlay loading={isLoading} message={loadingMessage} />
       <Notification />
