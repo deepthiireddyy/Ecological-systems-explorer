@@ -1,36 +1,32 @@
 const ee = require('@google/earthengine');
-const path = require('path');
-const fs = require('fs');
 
 let initialized = false;
 
 async function initializeGEE() {
   if (initialized) return;
 
-  const credPath = path.resolve(process.env.GEE_SERVICE_ACCOUNT_PATH);
+  // ✅ Read directly from ENV
+  const credentials = JSON.parse(process.env.GEE_SERVICE_ACCOUNT_JSON);
 
-  if (!fs.existsSync(credPath)) {
-    throw new Error(`GEE service account file not found at: ${credPath}`);
+  if (!credentials) {
+    throw new Error("GEE credentials not found in ENV");
   }
-
-  const credentials = JSON.parse(fs.readFileSync(credPath, 'utf8'));
 
   return new Promise((resolve, reject) => {
     ee.data.authenticateViaPrivateKey(
       credentials,
       () => {
-        // 🔥 FIX: include project for proper token generation
         ee.initialize(
           null,
           null,
           () => {
             initialized = true;
-            console.log('GEE initialized successfully with project:', credentials.project_id);
+            console.log('✅ GEE initialized successfully with project:', credentials.project_id);
             resolve();
           },
           (err) => reject(new Error('GEE init failed: ' + err)),
           {
-            project: credentials.project_id   // ✅ CRITICAL FIX
+            project: credentials.project_id
           }
         );
       },
