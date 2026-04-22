@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
-  timeout: 120000, // GEE can be slow
+  baseURL: import.meta.env.VITE_API_URL, // ✅ FIXED
+  timeout: 120000,
   headers: { 'Content-Type': 'application/json' }
 });
 
