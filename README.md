@@ -121,7 +121,7 @@ backend/credentials/gee-service-account.json
 
 ## 👩‍💻 Author
 
-Deepthi Reddy
+Deepthi Rayapureddy
 Geospatial Developer | Remote Sensing | Climate Analytics
 
 ---
