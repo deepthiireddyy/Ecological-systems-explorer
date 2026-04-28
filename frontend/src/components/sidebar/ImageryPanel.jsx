@@ -36,7 +36,7 @@ export default function ImageryPanel({ onImageryLoaded }) {
         vizType
       });
 
-      console.log("Tile URL:", result.tileUrl); // 🔥 debug
+      console.log("Tile URL:", result.tileUrl);
 
       if (!result.tileUrl) {
         throw new Error("No tile URL received from backend");
@@ -47,7 +47,6 @@ export default function ImageryPanel({ onImageryLoaded }) {
       setImageryLoaded(true);
       setActiveLayer('imagery');
 
-      // 🔥 SAFE CALL
       if (onImageryLoaded) {
         onImageryLoaded(result.tileUrl);
       }
@@ -65,7 +64,7 @@ export default function ImageryPanel({ onImageryLoaded }) {
   };
 
   return (
-    <SectionCard title="🖼 Generate Image Composite">
+    <SectionCard title="5. Generate Image Composite">
       {optical && (
         <div className="flex gap-3 mb-3">
           <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">

@@ -23,7 +23,7 @@ export default function SensorSelector() {
   const info = selectedDataset ? DATASET_INFO[selectedDataset] : null;
 
   return (
-    <SectionCard title="🛰 Satellite Sensor & Mission">
+    <SectionCard title="2. Satellite Sensor & Mission">
       {/* Group */}
       <label className="label-sm">Sensor Type</label>
       <select className="form-input mb-3" value={selectedGroup || ''} onChange={handleGroupChange}>

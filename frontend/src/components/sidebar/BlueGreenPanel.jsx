@@ -44,7 +44,7 @@ export default function BlueGreenPanel({ onBGLoaded }) {
   };
 
   return (
-    <SectionCard title="🌿💧 Blue–Green System">
+    <SectionCard title="7. Blue–Green System">
       <p className="text-xs text-gray-500 mb-3 leading-relaxed">
         Combines vegetation (NDVI) and water (NDWI) into a single ecological map with area statistics.
       </p>
@@ -59,14 +59,14 @@ export default function BlueGreenPanel({ onBGLoaded }) {
           disabled={!enabled || loadingBG}
           className="btn-green"
         >
-          {loadingBG ? <Spinner /> : '🌿 Green Cover (NDVI)'}
+          {loadingBG ? <Spinner /> : 'Green Cover (NDVI)'}
         </button>
         <button
           onClick={() => run('Blue Cover', bluegreenAPI.blue)}
           disabled={!enabled || loadingBG}
           className="btn-blue"
         >
-          {loadingBG ? <Spinner /> : '💧 Blue Cover (NDWI)'}
+          {loadingBG ? <Spinner /> : 'Blue Cover (NDWI)'}
         </button>
       </div>
 

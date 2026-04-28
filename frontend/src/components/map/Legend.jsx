@@ -107,7 +107,7 @@ export function BlueGreenLegend({ type, areas, vegAreas, waterAreas }) {
       if (type === 'green' && areas) {
         div.innerHTML = `
           <div style="font-weight:600;font-size:14px;margin-bottom:8px">
-            🌿 Green Cover (NDVI)
+            Green Cover (NDVI)
           </div>
           ${buildRows([
             { label: 'Low (0.2–0.4)', color: '#c7e9c0', area: areas['Low (0.2–0.4)'] },
@@ -118,7 +118,7 @@ export function BlueGreenLegend({ type, areas, vegAreas, waterAreas }) {
       } else if (type === 'blue' && areas) {
         div.innerHTML = `
           <div style="font-weight:600;font-size:14px;margin-bottom:8px">
-            💧 Blue Cover (NDWI)
+            Blue Cover (NDWI)
           </div>
           ${buildRows([
             { label: 'Low (0.2–0.4)', color: '#c6dbef', area: areas['Low (0.2–0.4)'] },
@@ -133,7 +133,7 @@ export function BlueGreenLegend({ type, areas, vegAreas, waterAreas }) {
 
         const header = `
           <div style="font-weight:600;font-size:14px;margin-bottom:8px">
-            🌿💧 Blue–Green System
+            Blue–Green System
           </div>
           <div style="display:grid;grid-template-columns:90px 1fr 1fr;gap:6px;margin-bottom:8px;font-size:11px;font-weight:600;color:#555">
             <span>Class</span>

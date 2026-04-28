@@ -54,7 +54,7 @@ export default function IndexPanel({ onIndexLoaded }) {
   };
 
   return (
-    <SectionCard title="📊 Environmental Indicator">
+    <SectionCard title="6. Environmental Indicator">
       {/* Index select */}
       <label className="label-sm">① Select Index</label>
       <select

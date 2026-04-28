@@ -6,7 +6,7 @@ export default function AOIControls({ onDrawAOI, onResetAOI }) {
   const { aoi, defaultAOI, setAOI } = useAppStore();
   const fileInputRef = useRef(null);
 
-  // 🔹 Handle GeoJSON Upload
+  // Handle GeoJSON Upload
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -23,7 +23,7 @@ export default function AOIControls({ onDrawAOI, onResetAOI }) {
           return;
         }
 
-        // 🔥 Update AOI in global store
+        // Update AOI in global store
         setAOI(geojson);
       } catch (err) {
         alert("Error reading GeoJSON file");
@@ -35,7 +35,7 @@ export default function AOIControls({ onDrawAOI, onResetAOI }) {
   };
 
   return (
-    <SectionCard title="📍 Define Study Area">
+    <SectionCard title="1. Define Study Area">
       <div className="flex gap-2">
         
         {/* Draw AOI */}

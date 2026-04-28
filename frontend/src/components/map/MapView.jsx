@@ -19,7 +19,6 @@ import { GradientLegend, BlueGreenLegend } from './Legend';
 import MapTitle from './MapTitle';
 import MapLoadingOverlay from './MapLoadingOverlay';
 
-// ── Fit bounds ─────────────────────────────────────────────
 function FitBoundsController({ geojson }) {
   const map = useMap();
 
@@ -37,7 +36,6 @@ function FitBoundsController({ geojson }) {
   return null;
 }
 
-// ── Legend ─────────────────────────────────────────────
 function ActiveLegend() {
   const {
     activeLayer,
@@ -77,7 +75,6 @@ function ActiveLegend() {
   return null;
 }
 
-// ── Title ─────────────────────────────────────────────
 function ConditionalMapTitle() {
   const { activeLayer, bgType } = useAppStore();
 
@@ -88,7 +85,6 @@ function ConditionalMapTitle() {
   return null;
 }
 
-// ── Click handler ─────────────────────────────────────────────
 function ClickInfoHandler({ onClick }) {
   const map = useMap();
 
@@ -108,7 +104,6 @@ function ClickInfoHandler({ onClick }) {
   return null;
 }
 
-// ── MAIN COMPONENT ─────────────────────────────────────────────
 export default function MapView({ geeLayerUrl, onAOIDrawn }) {
   const {
     aoi,
@@ -123,11 +118,9 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
 
   const featureGroupRef = useRef(null);
 
-  // FIXED STATE
   const [defaultAOI, setDefaultAOI] = useState(null);
   const [clickInfo, setClickInfo] = useState(null);
 
-  // Load default AOI
   useEffect(() => {
     fetch('/aoi.geojson')
       .then(res => res.json())
@@ -147,7 +140,6 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
       ? 'Computing spectral index…'
       : 'Generating Blue–Green system…';
 
-  // Click handler
   const handleMapClick = ({ lat, lng }) => {
     setClickInfo({
       lat: lat.toFixed(5),
@@ -155,7 +147,6 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
     });
   };
 
-  // Handle drawing
   const handleCreated = (e) => {
     const layer = e.layer;
 
@@ -190,7 +181,7 @@ export default function MapView({ geeLayerUrl, onAOIDrawn }) {
         {/* LAYERS CONTROL */}
         <LayersControl position="topright">
 
-          {/* 🔥 BASEMAPS */}
+          {/* BASEMAPS */}
           <LayersControl.BaseLayer checked name="Streets">
             <TileLayer
               url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'

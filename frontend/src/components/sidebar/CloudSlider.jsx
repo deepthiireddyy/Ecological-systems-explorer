@@ -20,7 +20,7 @@ export default function CloudSlider() {
   const { status, msg } = statusMsg();
 
   return (
-    <SectionCard title="☁️ Cloud Cover Threshold">
+    <SectionCard title="4. Cloud Cover Threshold">
       <div className="flex items-center gap-3">
         <input
           type="range"

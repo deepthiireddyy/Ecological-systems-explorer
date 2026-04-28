@@ -9,7 +9,6 @@ async function getIndexMapId({ dataset, aoi, startDate, endDate, cloudCover, ind
 
   if (!indexImg) throw new Error(`Index ${indexName} not supported for ${dataset}`);
 
-  // Compute actual min/max
   const stats = await new Promise((resolve, reject) => {
     indexImg.reduceRegion({
       reducer: ee.Reducer.minMax(),
@@ -23,7 +22,6 @@ async function getIndexMapId({ dataset, aoi, startDate, endDate, cloudCover, ind
     });
   });
 
-  // Extract min/max from stats object
   let min = 0, max = 1;
   for (const key in stats) {
     if (key.endsWith('_min') && stats[key] !== null) min = stats[key];

@@ -5,7 +5,6 @@ const useAppStore = create((set, get) => ({
   aoi: null,
   defaultAOI: null,
   setAOI: (aoi) => {
-    // First time an AOI is set, also save it as default
     const state = get();
     set({ aoi, defaultAOI: state.defaultAOI || aoi });
   },

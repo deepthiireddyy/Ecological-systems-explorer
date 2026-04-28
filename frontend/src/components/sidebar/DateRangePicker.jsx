@@ -31,7 +31,7 @@ export default function DateRangePicker() {
   };
 
   return (
-    <SectionCard title="📅 Time Period">
+    <SectionCard title="3. Time Period">
       <div className="flex gap-3">
         <div className="flex-1">
           <label className="label-sm">Start Date</label>

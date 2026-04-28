@@ -5,7 +5,6 @@ let initialized = false;
 async function initializeGEE() {
   if (initialized) return;
 
-  // ✅ Read directly from ENV
   const credentials = JSON.parse(process.env.GEE_SERVICE_ACCOUNT_JSON);
 
   if (!credentials) {
@@ -21,7 +20,7 @@ async function initializeGEE() {
           null,
           () => {
             initialized = true;
-            console.log('✅ GEE initialized successfully with project:', credentials.project_id);
+            console.log('GEE initialized successfully with project:', credentials.project_id);
             resolve();
           },
           (err) => reject(new Error('GEE init failed: ' + err)),
@@ -35,7 +34,6 @@ async function initializeGEE() {
   });
 }
 
-// ── GeoJSON → EE Geometry ─────────────────────────────
 function eeGeometryFromGeoJSON(geojson) {
   if (geojson.type === 'FeatureCollection') {
     return ee.FeatureCollection(geojson).geometry();
@@ -103,7 +101,6 @@ function computeIndex(image, dataset, indexName) {
   return null;
 }
 
-// ── Color palettes ─────────────────────────────
 const PALETTES = {
   Grayscale: ['000000', 'ffffff'],
   Spectral: ['9e0142', 'f46d43', 'ffffbf', '74add1', '5e4fa2'],
