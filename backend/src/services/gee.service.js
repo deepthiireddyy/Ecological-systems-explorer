@@ -1,15 +1,21 @@
 const ee = require('@google/earthengine');
+const fs = require('fs');
+const path = require('path');
 
 let initialized = false;
+
 
 async function initializeGEE() {
   if (initialized) return;
 
-  const credentials = JSON.parse(process.env.GEE_SERVICE_ACCOUNT_JSON);
+  const credentialsPath = path.resolve(
+    __dirname,
+    '../../credentials/gee-service-account.json'
+  );
 
-  if (!credentials) {
-    throw new Error("GEE credentials not found in ENV");
-  }
+  const credentials = JSON.parse(
+    fs.readFileSync(credentialsPath, 'utf8')
+  );
 
   return new Promise((resolve, reject) => {
     ee.data.authenticateViaPrivateKey(
@@ -20,19 +26,21 @@ async function initializeGEE() {
           null,
           () => {
             initialized = true;
-            console.log('GEE initialized successfully with project:', credentials.project_id);
+            console.log(
+              'GEE initialized successfully with project:',
+              credentials.project_id
+            );
             resolve();
           },
-          (err) => reject(new Error('GEE init failed: ' + err)),
-          {
-            project: credentials.project_id
-          }
+          err => reject(new Error('GEE init failed: ' + err)),
+          { project: credentials.project_id }
         );
       },
-      (err) => reject(new Error('GEE auth failed: ' + err))
+      err => reject(new Error('GEE auth failed: ' + err))
     );
   });
 }
+
 
 function eeGeometryFromGeoJSON(geojson) {
   if (geojson.type === 'FeatureCollection') {
